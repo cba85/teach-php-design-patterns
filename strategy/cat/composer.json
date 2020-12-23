@@ -1,7 +1,19 @@
 {
-    "autoload": {
-        "psr-4": {
-            "App\\": "app"
-        }
+  "name": "clement/strategy",
+  "description": "Strategy design pattern example",
+  "type": "project",
+  "license": "To Kill",
+  "authors": [
+    {
+      "name": "Clement Barbaza",
+      "email": "clement.barbaza@gmail.com"
     }
+  ],
+  "minimum-stability": "dev",
+  "require": {},
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/"
+    }
+  }
 }

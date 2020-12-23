@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Cat\Contracts;
+namespace App\Contracts;
 
 interface SpeakActionInterface
 {

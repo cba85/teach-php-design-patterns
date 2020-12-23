@@ -1,20 +1,9 @@
 <?php
 
 /*
-
 class Subscription
 {
-    public $cost;
-
-    public function price()
-    {
-        return 5;
-    }
-
-    public function priceWithSupport()
-    {
-        return 2;
-    }
+    private $cost;
 
     public function setCost($cost)
     {
@@ -25,36 +14,50 @@ class Subscription
     {
         return $this->cost;
     }
+
+    public function base() // Essentiel
+    {
+        return 7.99;
+    }
+
+    public function standardOffer() // Standard
+    {
+        return 4;
+    }
+
+    public function familyOffer() // Family
+    {
+        return 8;
+    }
 }
 
 $subscription = new Subscription;
-//echo $subscription->price();
-$subscription->setCost($subscription->price());
-$subscription->setCost($subscription->priceWithSupport());
+$subscription->setCost($subscription->base());
+$subscription->setCost($subscription->familyOffer());
 echo $subscription->getCost();
-
 */
 
 interface SubscriptionInterface
 {
     public function price();
-    public function description();
+    public function name();
 }
 
-class BasicSubscription implements SubscriptionInterface
+class Subscription implements SubscriptionInterface
 {
     public function price()
     {
-        return 5;
+        return 7.99;
     }
 
-    public function description()
+    public function name()
     {
-        return 'Basic subscription';
+        return "Essentiel";
     }
 }
 
-abstract class SubscriptionFeature implements SubscriptionInterface
+
+abstract class SubscriptionOption implements SubscriptionInterface
 {
     protected $subscription;
 
@@ -64,48 +67,44 @@ abstract class SubscriptionFeature implements SubscriptionInterface
     }
 
     abstract public function price();
-    abstract public function description();
+
+    abstract public function name();
 }
 
-class AdditionalSpaceFeature extends SubscriptionFeature
+class StandardSubscription extends SubscriptionOption
 {
+    protected $price = 4;
+    protected $name = "Standard";
+
     public function price()
     {
-        //return 3;
-        return $this->subscription->price() + 3;
+        return $this->subscription->price() + $this->price;
     }
 
-    public function description()
+    public function name()
     {
-        //return 'Additional space';
-        return $this->subscription->description() . ' + Additional space';
+        return "{$this->subscription->name()} + option {$this->name}";
     }
 }
 
-class SupportFeature extends SubscriptionFeature
+class FamilySubscription extends SubscriptionOption
 {
+    protected $price = 8;
+    protected $name = "Family";
+
     public function price()
     {
-        //return 1;
-        return $this->subscription->price() + 1;
+        return $this->subscription->price() + $this->price;
     }
 
-    public function description()
+    public function name()
     {
-        //return 'Support';
-        return $this->subscription->description() . ' + Support';
+        return "{$this->subscription->name()} + option {$this->name}";
     }
 }
 
-//$subscription = new BasicSubscription;
-
-//$subscription = new AdditionalSpaceFeature(new BasicSubscription);
-
-//$subscription = new SupportFeature(new AdditionalSpaceFeature(new BasicSubscription));
-
-$subscription = new BasicSubscription;
-$subscription = new SupportFeature($subscription);
-$subscription = new AdditionalSpaceFeature($subscription);
-
+$subscription = new Subscription;
+$subscription = new StandardSubscription(new Subscription);
+$subscription = new FamilySubscription(new Subscription);
+echo $subscription->name();
 echo $subscription->price();
-echo $subscription->description();

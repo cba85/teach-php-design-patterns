@@ -12,45 +12,6 @@ interface Subject
     public function notify();
 }
 
-// STEP 1
-/*
-class MailingListSignUp implements Subject
-{
-
-    protected $observers = [];
-
-    public $user;
-
-    public function __construct($user)
-    {
-        $this->user = $user;
-    }
-
-    public function attach(Observer $observer)
-    {
-        $this->observers[] = $observer;
-    }
-
-    public function detach(Observer $observer)
-    {
-        for ($i = 0; $i < count($this->observers); $i++) {
-            if ($this->observers[$i] == $observer) {
-                unset($this->observers[$i]);
-            }
-            $this->observers = array_values($this->observers);
-        }
-    }
-
-    public function notify()
-    {
-        foreach ($this->observers as $observer) {
-            $observer->handle($this);
-        }
-    }
-}
-*/
-
-// STEP 2
 trait Subjectable
 {
     protected $observers = [];
@@ -62,9 +23,9 @@ trait Subjectable
 
     public function detach(Observer $observer)
     {
-        for ($i = 0; $i < count($this->observers); $i++) {
-            if ($this->observers[$i] == $observer) {
-                unset($this->observers[$i]);
+        foreach ($this->observers as $key => $value) {
+            if ($value == $observer) {
+                unset($this->observers[$key]);
             }
             $this->observers = array_values($this->observers);
         }
@@ -72,14 +33,13 @@ trait Subjectable
 
     public function notify()
     {
-        foreach ($this->observers as $observer) {
+        foreach ($this->observers as $key => $observer) {
             $observer->handle($this);
         }
     }
 }
 
-// STEP 2
-class MailingListSignUp implements Subject
+class NewsletterSignUp implements Subject
 {
     use Subjectable;
 
@@ -91,48 +51,44 @@ class MailingListSignUp implements Subject
     }
 }
 
-// STEP 2
-class Login implements Subject
+class NewUserSignUp implements Subject
 {
     use Subjectable;
 
-    public $user;
+    public $admin;
 
-    public function __construct($user)
+    public function __construct($admin)
     {
-        $this->user = $user;
-    }
-}
-
-class UpdateMailingStatusInDatabase implements Observer
-{
-    public function handle($event)
-    {
-        echo "Update status in database: " . $event->user->id;
-    }
-}
-
-class SubscribeUserToService implements Observer
-{
-    public function handle($event)
-    {
-        echo "Subscribe user to MailChimp: " . $event->user->email;
+        $this->admin = $admin;
     }
 }
 
 class User
 {
     public $id = 1;
-    public $email = "clement@example.com";
+    public $email = "clement@webstart.com";
+}
+
+class NewProductsNewsletter implements Observer
+{
+    public function handle($event)
+    {
+        echo "{$event->user->email} subscribed to new products newsletter";
+    }
+}
+
+class NewServicesNewsletter implements Observer
+{
+    public function handle($event)
+    {
+        echo "{$event->user->email} subscribed to new services newsletter";
+    }
 }
 
 $user = new User;
-
-$event = new MailingListSignUp($user);
-$event->attach(new UpdateMailingStatusInDatabase);
-$event->attach(new SubscribeUserToService);
-
-//$event->detach(new UpdateMailingStatusInDatabase);
-//var_dump($event);
+$event = new NewsletterSignUp($user);
+$event->attach(new NewProductsNewsletter);
+$event->attach(new NewServicesNewsletter);
+$event->detach(new NewServicesNewsletter);
 
 $event->notify();

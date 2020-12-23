@@ -1,5 +1,19 @@
 <?php
 
+/*
+class Uploader
+{
+    public function upload($file, $destination)
+    {
+        // FTP
+        return;
+    }
+}
+
+$uploader = new Uploader();
+$uploader->upload('image.png', '/img');
+*/
+
 class Config
 {
     protected $data = [
@@ -7,28 +21,22 @@ class Config
             'default' => 's3',
             'services' => [
                 's3' => [
-                    'key' => '123',
-                    'secret' => '456',
+                    'apiKey' => 'azertyuiop',
+                    'secret' => 'qsdfghjklm'
                 ],
                 'ftp' => [
-                    'host' => 'abc',
-                ],
-            ],
-        ],
+                    'host' => 'ftp://11.1.1.1',
+                    'password' => 'azertyuiop'
+                ]
+            ]
+        ]
     ];
 
-    public function get($keys)
+    public function get($key)
     {
-        $data = $this->data;
-        $keys = explode('.', $keys);
-
-        foreach ($keys as $key) {
-            if (array_key_exists($key, $data)) {
-                $data = $data[$key];
-                continue;
-            }
+        if (array_key_exists($key, $this->data)) {
+            return $this->data[$key];
         }
-        return $data;
     }
 }
 
@@ -43,7 +51,7 @@ class Uploader implements UploaderInterface
 
     public function __construct($adapter)
     {
-        $this->adapter = $adapter;
+        return $this->adapter;
     }
 
     public function upload($file, $destination)
@@ -54,24 +62,22 @@ class Uploader implements UploaderInterface
 
 class S3Adapter
 {
-
 }
 
 class FtpAdapter
 {
-
 }
 
 class AdapterFactory
 {
     public function make(Config $config)
     {
-        switch ($config->get('upload.default')) {
+        switch ($config->get('upload')['default']) {
             case 's3':
                 return new S3Adapter;
                 break;
-            case 'ftp':
-                return new FTPAdapter;
+            case 'ftp';
+                return new FtpAdapter;
                 break;
         }
     }
@@ -79,7 +85,7 @@ class AdapterFactory
 
 class UploaderFactory
 {
-    protected $adapter;
+    protected AdapterFactory $adapter;
 
     public function __construct(AdapterFactory $adapter)
     {
@@ -93,8 +99,6 @@ class UploaderFactory
 }
 
 $config = new Config;
-echo $config->get('upload.services.s3.secret');
 $factory = new UploaderFactory(new AdapterFactory);
 $uploader = $factory->make($config);
-
-print_r($uploader->upload('file.txt', 'destination.txt'));
+$uploader->upload('image.png', '/img');
